@@ -50,7 +50,7 @@ ascii_art:
 		printf "██╔══╝     ██║        ██╔═══╝ ██╔══██╗██║██║╚██╗██║   ██║   ██╔══╝  \n"; \
 		printf "██║        ██║███████╗██║     ██║  ██║██║██║ ╚████║   ██║   ██║     \n"; \
 		printf "╚═╝        ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝   ╚═╝   ╚═╝\n"; \
-		printf "		     					   jvidal-t\033[0m\n"; \
+		printf "		     					 by jvidal-t\033[0m\n"; \
 		echo "$(YELLOW)\nCreating program...$(GREEN)"; \
 		$(MAKE) -s $(NAME); \
 	else \

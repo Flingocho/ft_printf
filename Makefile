@@ -1,77 +1,89 @@
-# Terminal colors
-RED = \033[0;31m
-GREEN = \033[0;32m
-YELLOW = \033[0;33m
-BLUE = \033[0;34m
-MAGENTA = \033[0;35m
-CYAN = \033[0;36m
-RESET = \033[0m
-
-# Compiler and flags
-CC = cc
-CFLAGS = -Wall -Wextra -Werror
-RM = rm -f
-
-# Directories
-SRC_DIR = src
-INC_DIR = include
-OBJ_DIR = obj
-
-# Source files
-SRC_FILES = ft_printf.c ft_printf_utils.c
-SRCS = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
-OBJS = $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.c=.o))
+############################################################################################################
+# Variables
 
 # Library name
-NAME = libftprintf.a
+NAME			= libftprintf.a
 
-# Printf for ASCII art display
-PRINTF = printf
+# Directories
+SRC_DIR			= src
+INC_DIR			= include
+OBJ_DIR			= obj
 
+# Include files
+INCLUDE			= $(INC_DIR)/ft_printf.h
+
+# List of source files
+SRCS_FILES		= ft_printf.c ft_printf_utils.c
+					
+# Complete paths					
+SRCS			= $(addprefix $(SRC_DIR)/, $(SRCS_FILES))
+
+# Objects
+OBJS			= $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
+
+# Compiler settings
+CC				= cc
+RM				= rm -rf
+CFLAGS			= -Wall -Wextra -Werror -I$(INC_DIR)
+LIB				= ar rcs
+
+# Colors
+GREEN			= \033[0;32m
+UGREEN			= \033[4;32m
+RED				= \033[0;31m
+YELLOW			= \033[0;33m
+BLUE			= \033[0;34m
+CYAN			= \033[0;36m
+NC				= \033[0m # No color
+
+############################################################################################################
 # Rules
-all: $(NAME)
 
-# Create directories
-dirs:
+all: ascii_art
+
+ascii_art:
+	@if ! $(MAKE) -q $(NAME); then \
+		printf "$(CYAN)\n"; \
+		printf "███████╗████████╗     ██████╗ ██████╗ ██╗███╗   ██╗████████╗███████╗\n"; \
+		printf "██╔════╝╚══██╔══╝     ██╔══██╗██╔══██╗██║████╗  ██║╚══██╔══╝██╔════╝\n"; \
+		printf "█████╗     ██║        ██████╔╝██████╔╝██║██╔██╗ ██║   ██║   █████╗  \n"; \
+		printf "██╔══╝     ██║        ██╔═══╝ ██╔══██╗██║██║╚██╗██║   ██║   ██╔══╝  \n"; \
+		printf "██║        ██║███████╗██║     ██║  ██║██║██║ ╚████║   ██║   ██║     \n"; \
+		printf "╚═╝        ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝   ╚═╝   ╚═╝\n"; \
+		printf "		     					   jvidal-t\033[0m\n"; \
+		echo "$(YELLOW)\nCreating program...$(GREEN)"; \
+		$(MAKE) -s $(NAME); \
+	else \
+		echo "$(GREEN)[$(NAME)] is already up to date.$(NC)"; \
+	fi
+
+# Rule to build the library from object files
+$(NAME): $(OBJS)
+	@$(LIB) $(NAME) $(OBJS) && \
+	(printf "$(UGREEN)\n%s$(NC)" "[$(NAME)]"; printf "$(GREEN)%s$(NC)\n" " Compiled successfully.")
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(INCLUDE)
 	@mkdir -p $(OBJ_DIR)
+	@echo -n "█"
+	@$(CC) $(CFLAGS) -c -o $@ $<
 
-# Compile library
-$(NAME): dirs $(OBJS)
-	@ar rcs $(NAME) $(OBJS)
-	@$(PRINTF) "$(GREEN)[SUCCESS]$(RESET) Compiled $(BLUE)$(NAME)$(RESET)\n"
-	@$(PRINTF) "$(CYAN)"
-	@$(PRINTF) "  _____ _______   _____  _____  _____ _   _ _______ ______ \n"
-	@$(PRINTF) " |  __ \__   __| |  __ \|  __ \|_   _| \ | |__   __|  ____|\n"
-	@$(PRINTF) " | |__) | | |    | |__) | |__) | | | |  \| |  | |  | |__   \n"
-	@$(PRINTF) " |  ___/  | |    |  ___/|  _  /  | | | . \` |  | |  |  __|  \n"
-	@$(PRINTF) " | |      | |    | |    | | \ \ _| |_| |\  |  | |  | |     \n"
-	@$(PRINTF) " |_|      |_|    |_|    |_|  \_\_____|_| \_|  |_|  |_|     \n"
-	@$(PRINTF) "$(RESET)\n"
-
-# Compile objects
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | dirs
-	@$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
-	@$(PRINTF) "$(GREEN)[OK]$(RESET) Compiled $(notdir $<)\n"
-
-# Clean objects
+# Rule to remove all object files
 clean:
-	@$(RM) $(OBJS)
-	@rm -rf $(OBJ_DIR)
-	@$(PRINTF) "$(YELLOW)[CLEAN]$(RESET) Removed object files\n"
+	@$(RM) $(OBJ_DIR)
+	@printf "$(RED)%s$(NC)\n" "[$(NAME)] Object files cleaned."
 
-# Clean all
+# Rule to remove all generated files (objects and library)
 fclean: clean
 	@$(RM) $(NAME)
-	@$(PRINTF) "$(YELLOW)[CLEAN]$(RESET) Removed $(BLUE)$(NAME)$(RESET)\n"
+	@printf "$(RED)%s$(NC)\n" "[$(NAME)] Cleaned successfully."
 
-# Rebuild
+# Rule to rebuild the project from scratch
 re: fclean all
 
-# For testing purposes - create a simple test program
+# Test rule to compile a simple test program
 test: $(NAME)
-	@$(CC) $(CFLAGS) -I$(INC_DIR) tests/test.c -L. -lftprintf -o test_printf
-	@$(PRINTF) "$(GREEN)[SUCCESS]$(RESET) Test program created! Run with ./test_printf\n"
+	@$(CC) tests/test.c $(CFLAGS) -L. -lgnl -o test_gnl && \
+	printf "$(GREEN)%s$(NC)\n" "Test program compiled. Run with ./test_gnl"
 
-.PHONY: all clean fclean re dirs test
-
-.PHONY:			all clean fclean re bonus
+# Declaration of phony targets (not associated with files)
+.PHONY: all ascii_art clean fclean re test

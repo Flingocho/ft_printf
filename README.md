@@ -1,4 +1,4 @@
-# 🖨️ ft_printf
+# 🖨️ ft_printf - let's start talking!
 
 <div align="center">
   <img src="https://img.shields.io/badge/Language-C-blue" alt="Language">
